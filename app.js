@@ -606,7 +606,12 @@ if (loginPanel) loginPanel.hidden = allowed;
   }
 
   const loginBtn = $("loginBtn");
-  if (loginBtn) {
+if (loginBtn) {
+  loginBtn.onclick = function () {
+    console.log("Login button clicked");
+    login();
+  };
+}
     loginBtn.addEventListener("click", login);
   }
 
