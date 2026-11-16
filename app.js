@@ -607,7 +607,7 @@ if (loginPanel) loginPanel.hidden = allowed;
     }
   }
 
-  async function logout() {
+async function logout() {
     try {
       const { error } = await client.auth.signOut();
 
