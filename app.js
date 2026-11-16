@@ -605,22 +605,11 @@ if (loginPanel) loginPanel.hidden = allowed;
     modalMessage("تم تسجيل الخروج.");
   }
 
-  const loginBtn = $("loginBtn");
-if (loginBtn) {
-  loginBtn.onclick = function () {
-    console.log("Login button clicked");
-    login();
-  };
-}
-  loginBtn.onclick = function () {
-    console.log("Login button clicked");
-    login();
-  };
-}
-    loginBtn.addEventListener("click", login);
-  }
+    const loginBtn = $("loginBtn");
 
-  const logoutBtn = $("logoutBtn");
+  if (loginBtn) {
+    loginBtn.onclick = login;
+  }
   if (logoutBtn) {
     logoutBtn.addEventListener("click", logout);
   }
