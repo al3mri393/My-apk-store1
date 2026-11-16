@@ -544,6 +544,20 @@
   }
 
   const logoutButton = $("logoutButton");
+    const adminOpen = $("adminOpen");
+  if (adminOpen) {
+    adminOpen.addEventListener("click", () => {
+      const loginDialog = $("adminDialog");
+      if (loginDialog) {
+        loginDialog.showModal();
+      } else {
+        const loginForm = $("loginForm");
+        if (loginForm) {
+          loginForm.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+    });
+  }
   if (logoutButton) {
     logoutButton.addEventListener("click", logout);
   }
