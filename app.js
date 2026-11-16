@@ -545,7 +545,22 @@ if (loginPanel) loginPanel.hidden = allowed;
       adminDialog.close();
     });
   }
+async function updateAdminView() {
+  const adminPanel = $("adminPanel");
+  const loginPanel = $("loginPanel");
+  const allowed = await isAdmin();
 
+  if (adminPanel) adminPanel.hidden = !allowed;
+  if (loginPanel) loginPanel.hidden = allowed;
+
+  const identity = $("adminIdentity");
+  if (identity && allowed) {
+    const { data } = await client.auth.getUser();
+    identity.textContent = data.user?.email || "الأدمن";
+  }
+
+  renderAdminApps();
+}
   const loginBtn = $("loginBtn");
   if (loginBtn) {
     loginBtn.addEventListener("click", login);
