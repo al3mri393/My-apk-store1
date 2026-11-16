@@ -501,65 +501,59 @@
     renderAdminApps();
   }
 
-  async function login(event) {
-    event.preventDefault();
 
-    const email = $("adminEmail")?.value.trim();
-    const password = $("adminPassword")?.value;
+  async function login() {
+    const email = $("email")?.value.trim();
+    const password = $("password")?.value;
 
     if (!email || !password) {
-      message("أدخل البريد الإلكتروني وكلمة المرور.", true);
+      modalMessage("أدخل البريد الإلكتروني وكلمة المرور.", true);
       return;
     }
+
+    const button = $("loginBtn");
+    if (button) button.disabled = true;
 
     const { error } = await client.auth.signInWithPassword({
       email,
       password
     });
 
+    if (button) button.disabled = false;
+
     if (error) {
-      message("تعذر تسجيل الدخول: " + error.message, true);
+      modalMessage("تعذر تسجيل الدخول: " + error.message, true);
       return;
     }
 
-    message("تم تسجيل الدخول.");
+    modalMessage("تم تسجيل الدخول بنجاح.");
     await updateAdminView();
   }
 
-  async function logout() {
-    const { error } = await client.auth.signOut();
+  const adminOpen = $("adminOpen");
+  const adminDialog = $("adminDialog");
 
-    if (error) {
-      message("تعذر تسجيل الخروج: " + error.message, true);
-      return;
-    }
-
-    message("تم تسجيل الخروج.");
-    await updateAdminView();
-  }
-
-  const loginForm = $("loginForm");
-  if (loginForm) {
-    loginForm.addEventListener("submit", login);
-  }
-
-  const logoutButton = $("logoutButton");
-    const adminOpen = $("adminOpen");
-  if (adminOpen) {
+  if (adminOpen && adminDialog) {
     adminOpen.addEventListener("click", () => {
-      const loginDialog = $("adminDialog");
-      if (loginDialog) {
-        loginDialog.showModal();
-      } else {
-        const loginForm = $("loginForm");
-        if (loginForm) {
-          loginForm.scrollIntoView({ behavior: "smooth" });
-        }
-      }
+      adminDialog.showModal();
     });
   }
-  if (logoutButton) {
-    logoutButton.addEventListener("click", logout);
+
+  const closeAdmin = $("closeAdmin");
+  if (closeAdmin && adminDialog) {
+    closeAdmin.addEventListener("click", () => {
+      adminDialog.close();
+    });
+  }
+
+  const loginBtn = $("loginBtn");
+  if (loginBtn) {
+    loginBtn.addEventListener("click", login);
+  }
+
+  const logoutBtn = $("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", logout);
   }
 
   const addForm = $("appForm");
