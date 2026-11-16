@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -8,10 +9,19 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
+
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+
   <header class="topbar wrap">
-    <a class="brand" href="#"><span class="brand-mark">م</span><span>معرض <b>تطبيقاتي</b></span></a>
-<button id="loginBtn" type="button" class="btn btn-primary full">تسجيل الدخول</button>
+    <a class="brand" href="#">
+      <span class="brand-mark">م</span>
+      <span>معرض <b>تطبيقاتي</b></span>
+    </a>
+
+    <button id="adminOpen" type="button" class="btn btn-primary">
+      لوحة الأدمن
+    </button>
   </header>
 
   <main>
@@ -20,32 +30,58 @@
         <span class="eyebrow"><i></i> مكتبة تطبيقاتك في مكان واحد</span>
         <h1>اكتشف تطبيقاتك<br><em>بأسلوب جديد.</em></h1>
         <p>منصة بسيطة وأنيقة لاستعراض التطبيقات وتحميل أحدث إصداراتها بسهولة.</p>
-        <a class="btn btn-primary" href="#apps">استعرض التطبيقات <span>←</span></a>
+        <a class="btn btn-primary" href="#apps">
+          استعرض التطبيقات <span>←</span>
+        </a>
       </div>
+
       <div class="hero-orbit" aria-hidden="true">
-        <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
-        <div class="hero-device"><span class="device-glow"></span><div class="device-logo">م</div><strong>تطبيقات تستحق التجربة</strong><small>تحميل • تحديث • اكتشاف</small></div>
-        <span class="float-chip chip-one">APK</span><span class="float-chip chip-two">01 / 02</span>
+        <div class="orbit orbit-one"></div>
+        <div class="orbit orbit-two"></div>
+        <div class="hero-device">
+          <span class="device-glow"></span>
+          <div class="device-logo">م</div>
+          <strong>تطبيقات تستحق التجربة</strong>
+          <small>تحميل • تحديث • اكتشاف</small>
+        </div>
+        <span class="float-chip chip-one">APK</span>
+        <span class="float-chip chip-two">01 / 02</span>
       </div>
     </section>
 
     <section id="apps" class="wrap app-section">
-      <div class="section-head"><div><span class="eyebrow">المكتبة</span><h2>تطبيقاتنا</h2></div><span id="appCount" class="count">جارٍ تحميل التطبيقات...</span></div>
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">المكتبة</span>
+          <h2>تطبيقاتنا</h2>
+        </div>
+        <span id="appCount" class="count">جارٍ تحميل التطبيقات...</span>
+      </div>
+
       <div id="notice" class="notice" hidden></div>
+
       <div id="appsGrid" class="apps-grid">
-        <article class="app-card skeleton"></article><article class="app-card skeleton"></article>
+        <article class="app-card skeleton"></article>
+        <article class="app-card skeleton"></article>
       </div>
     </section>
 
     <section id="about" class="wrap about">
-      <div><span class="eyebrow">مصمّم ببساطة</span><h2>كل ما تحتاجه،<br><em>في مكان واحد.</em></h2></div>
+      <div>
+        <span class="eyebrow">مصمّم ببساطة</span>
+        <h2>كل ما تحتاجه،<br><em>في مكان واحد.</em></h2>
+      </div>
       <p>يُدار هذا المعرض من لوحة تحكم خاصة. ملفات التطبيقات محفوظة في التخزين السحابي، وتُحمّل عبر روابط مخصصة.</p>
     </section>
   </main>
 
-  <footer class="wrap footer"><span>© <span id="year"></span> معرض تطبيقاتي</span><span>واجهة عربية • تصميم متجاوب</span></footer>
+  <footer class="wrap footer">
+    <span>© <span id="year"></span> معرض تطبيقاتي</span>
+    <span>واجهة عربية • تصميم متجاوب</span>
+  </footer>
 
   <dialog id="adminDialog" class="modal">
+
     <div class="modal-head">
       <div>
         <span class="eyebrow">مساحة الإدارة</span>
@@ -70,39 +106,61 @@
           تسجيل الدخول
         </button>
       </form>
-    </div> 
-      <p class="muted">سجّل الدخول بحساب الأدمن الذي أنشأته في Supabase.</p>
-      <label>البريد الإلكتروني<input id="email" type="email" autocomplete="username" placeholder="admin@example.com"></label>
-      <label>كلمة المرور<input id="password" type="password" autocomplete="current-password" placeholder="••••••••"></label>
-<button id="loginBtn" type="submit" class="btn btn-primary full">تسجيل الدخول</button>
     </div>
+
     <div id="adminPanel" hidden>
-      <div class="admin-toolbar"><span id="adminIdentity" class="muted"></span><button id="logoutBtn" class="btn btn-ghost">تسجيل الخروج</button></div>
+      <div class="admin-toolbar">
+        <span id="adminIdentity" class="muted"></span>
+        <button id="logoutBtn" type="button" class="btn btn-ghost">
+          تسجيل الخروج
+        </button>
+      </div>
+
       <form id="appForm" class="admin-form">
         <h3>إضافة تطبيق</h3>
-        <label>اسم التطبيق<input id="appName" required maxlength="80" placeholder="مثال: Car-th"></label>
-        <label>وصف التطبيق<textarea id="appDescription" rows="3" placeholder="اكتب وصفاً مختصراً"></textarea></label>
-        <label>رقم الإصدار<input id="appVersion" value="1.0.0" required maxlength="30"></label>
-        <label>ملف APK<input id="apkFile" type="file" accept=".apk,application/vnd.android.package-archive" required></label>
-        
-<label>صورة غلاف التطبيق
-  <input id="appImage" type="file" accept="image/*">
-</label>
 
-<label>أيقونة التطبيق
-  <input id="appIcon" type="file" accept="image/*">
-</label>
+        <label>اسم التطبيق
+          <input id="appName" required maxlength="80" placeholder="مثال: Car-th">
+        </label>
 
-        <button id="uploadBtn" class="btn btn-primary full" type="submit">رفع التطبيق وإضافته</button>
+        <label>وصف التطبيق
+          <textarea id="appDescription" rows="3" placeholder="اكتب وصفاً مختصراً"></textarea>
+        </label>
+
+        <label>رقم الإصدار
+          <input id="appVersion" value="1.0.0" required maxlength="30">
+        </label>
+
+        <label>ملف APK
+          <input id="apkFile" type="file" accept=".apk,application/vnd.android.package-archive" required>
+        </label>
+
+        <label>صورة غلاف التطبيق
+          <input id="appImage" type="file" accept="image/*">
+        </label>
+
+        <label>أيقونة التطبيق
+          <input id="appIcon" type="file" accept="image/*">
+        </label>
+
+        <button id="uploadBtn" class="btn btn-primary full" type="submit">
+          رفع التطبيق وإضافته
+        </button>
+
         <p class="muted tiny">يُسمح بملفات APK فقط. حجم الملف يخضع لحدود مساحة التخزين في Supabase.</p>
       </form>
-      <h3>التطبيقات المسجلة</h3><div id="adminApps" class="admin-apps"></div>
+
+      <h3>التطبيقات المسجلة</h3>
+      <div id="adminApps" class="admin-apps"></div>
     </div>
+
     <p id="modalMessage" class="form-message" role="status"></p>
+
   </dialog>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="app.js"></script>
+
 </body>
 </html>
