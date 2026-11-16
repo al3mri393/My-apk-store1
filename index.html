@@ -61,6 +61,15 @@
         <label>وصف التطبيق<textarea id="appDescription" rows="3" placeholder="اكتب وصفاً مختصراً"></textarea></label>
         <label>رقم الإصدار<input id="appVersion" value="1.0.0" required maxlength="30"></label>
         <label>ملف APK<input id="apkFile" type="file" accept=".apk,application/vnd.android.package-archive" required></label>
+        
+<label>صورة غلاف التطبيق
+  <input id="appImage" type="file" accept="image/*">
+</label>
+
+<label>أيقونة التطبيق
+  <input id="appIcon" type="file" accept="image/*">
+</label>
+
         <button id="uploadBtn" class="btn btn-primary full" type="submit">رفع التطبيق وإضافته</button>
         <p class="muted tiny">يُسمح بملفات APK فقط. حجم الملف يخضع لحدود مساحة التخزين في Supabase.</p>
       </form>
