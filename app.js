@@ -94,9 +94,15 @@
     const path = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
     $("uploadBtn").disabled = true; $("uploadBtn").textContent = "جارٍ الرفع...";
     try {
-      const { error: upErr } = await client.storage.from(cfg.BUCKET).upload(path, file, {
-        cacheControl: "3600", upsert: false, contentType: "application/vnd.android.package-archive"
-      });
+const apkFile = new File([file], file.name, {
+  type: "application/vnd.android.package-archive"
+});
+
+const { error: upErr } = await client.storage.from(cfg.BUCKET).upload(path, apkFile, {
+  cacheControl: "3600",
+  upsert: false,
+  contentType: "application/vnd.android.package-archive"
+});
       if (upErr) throw upErr;
       const { error: dbErr } = await client.from("apps").insert({
         name, description: $("appDescription").value.trim(), version, storage_path: path
