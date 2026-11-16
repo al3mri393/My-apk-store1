@@ -612,6 +612,11 @@ if (loginBtn) {
     login();
   };
 }
+  loginBtn.onclick = function () {
+    console.log("Login button clicked");
+    login();
+  };
+}
     loginBtn.addEventListener("click", login);
   }
 
