@@ -550,12 +550,20 @@ if (loginPanel) loginPanel.hidden = allowed;
   async function updateAdminView() {
     const adminPanel = $("adminPanel");
     const loginPanel = $("loginPanel");
+    const loginForm = $("loginForm");
+
     const allowed = await isAdmin();
 
     if (adminPanel) adminPanel.hidden = !allowed;
-    if (loginPanel) loginPanel.hidden = allowed;
+
+    if (loginPanel) {
+      loginPanel.hidden = allowed;
+    } else if (loginForm) {
+      loginForm.hidden = allowed;
+    }
 
     const identity = $("adminIdentity");
+
     if (identity && allowed) {
       const { data } = await client.auth.getUser();
       identity.textContent = data.user?.email || "الأدمن";
@@ -564,7 +572,9 @@ if (loginPanel) loginPanel.hidden = allowed;
     renderAdminApps();
   }
 
-  async function login() {
+  async function login(event) {
+    if (event) event.preventDefault();
+
     const email = $("email")?.value.trim();
     const password = $("password")?.value;
 
@@ -574,9 +584,10 @@ if (loginPanel) loginPanel.hidden = allowed;
     }
 
     const button = $("loginBtn");
-    if (button) button.disabled = true;
 
     try {
+      if (button) button.disabled = true;
+
       const { error } = await client.auth.signInWithPassword({
         email,
         password
@@ -586,53 +597,76 @@ if (loginPanel) loginPanel.hidden = allowed;
 
       await updateAdminView();
       modalMessage("تم تسجيل الدخول بنجاح.");
+
     } catch (error) {
       modalMessage("تعذر تسجيل الدخول: " + error.message, true);
+      console.error("Login error:", error);
+
     } finally {
       if (button) button.disabled = false;
     }
   }
 
   async function logout() {
-    const { error } = await client.auth.signOut();
+    try {
+      const { error } = await client.auth.signOut();
 
-    if (error) {
+      if (error) throw error;
+
+      await updateAdminView();
+      modalMessage("تم تسجيل الخروج.");
+
+    } catch (error) {
       modalMessage("تعذر تسجيل الخروج: " + error.message, true);
-      return;
+      console.error(error);
     }
-
-    await updateAdminView();
-    modalMessage("تم تسجيل الخروج.");
   }
 
-      const loginBtn = $("loginBtn");
+  const adminOpen = $("adminOpen");
+  const adminDialog = $("adminDialog");
+  const closeAdmin = $("closeAdmin");
+
+  if (adminOpen && adminDialog) {
+    adminOpen.addEventListener("click", () => {
+      if (!adminDialog.open) adminDialog.showModal();
+    });
+  }
+
+  if (closeAdmin && adminDialog) {
+    closeAdmin.addEventListener("click", () => {
+      adminDialog.close();
+    });
+  }
+
+  const loginForm = $("loginForm");
+  const loginBtn = $("loginBtn");
+
+  if (loginForm) {
+    loginForm.addEventListener("submit", login);
+  } else if (loginBtn) {
+    loginBtn.addEventListener("click", login);
+  }
+
   const logoutBtn = $("logoutBtn");
 
-  if (loginBtn) {
-    loginBtn.onclick = login;
-  }
-
-  if (logoutBtn) {
-    logoutBtn.onclick = logout;
-  }
-
-  if (loginBtn) {
-    loginBtn.onclick = login;
-  }
   if (logoutBtn) {
     logoutBtn.addEventListener("click", logout);
   }
 
   const addForm = $("appForm");
+
   if (addForm) {
     addForm.addEventListener("submit", handleNewApp);
   }
 
-  client.auth.onAuthStateChange(() => {
-    updateAdminView();
+  client.auth.onAuthStateChange((event) => {
+    if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+      updateAdminView();
+    }
   });
 
   loadApps();
   updateAdminView();
 
 })();
+  
