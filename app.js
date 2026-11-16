@@ -530,51 +530,81 @@ if (loginPanel) loginPanel.hidden = allowed;
     await updateAdminView();
   }
 
-const adminOpen = $("adminOpen");
-const adminDialog = $("adminDialog");
-const closeAdmin = $("closeAdmin");
 
-if (adminOpen && adminDialog) {
-  adminOpen.onclick = () => {
-    adminDialog.showModal();
-  };
-}
-
-if (closeAdmin && adminDialog) {
-  closeAdmin.onclick = () => {
-    adminDialog.close();
-  };
-}
+  const adminOpen = $("adminOpen");
   const adminDialog = $("adminDialog");
+  const closeAdmin = $("closeAdmin");
 
   if (adminOpen && adminDialog) {
     adminOpen.addEventListener("click", () => {
-      adminDialog.showModal();
+      if (!adminDialog.open) adminDialog.showModal();
     });
   }
 
-  const closeAdmin = $("closeAdmin");
   if (closeAdmin && adminDialog) {
     closeAdmin.addEventListener("click", () => {
       adminDialog.close();
     });
   }
-async function updateAdminView() {
-  const adminPanel = $("adminPanel");
-  const loginPanel = $("loginPanel");
-  const allowed = await isAdmin();
 
-  if (adminPanel) adminPanel.hidden = !allowed;
-  if (loginPanel) loginPanel.hidden = allowed;
+  async function updateAdminView() {
+    const adminPanel = $("adminPanel");
+    const loginPanel = $("loginPanel");
+    const allowed = await isAdmin();
 
-  const identity = $("adminIdentity");
-  if (identity && allowed) {
-    const { data } = await client.auth.getUser();
-    identity.textContent = data.user?.email || "الأدمن";
+    if (adminPanel) adminPanel.hidden = !allowed;
+    if (loginPanel) loginPanel.hidden = allowed;
+
+    const identity = $("adminIdentity");
+    if (identity && allowed) {
+      const { data } = await client.auth.getUser();
+      identity.textContent = data.user?.email || "الأدمن";
+    }
+
+    renderAdminApps();
   }
 
-  renderAdminApps();
-}
+  async function login() {
+    const email = $("email")?.value.trim();
+    const password = $("password")?.value;
+
+    if (!email || !password) {
+      modalMessage("أدخل البريد الإلكتروني وكلمة المرور.", true);
+      return;
+    }
+
+    const button = $("loginBtn");
+    if (button) button.disabled = true;
+
+    try {
+      const { error } = await client.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+
+      await updateAdminView();
+      modalMessage("تم تسجيل الدخول بنجاح.");
+    } catch (error) {
+      modalMessage("تعذر تسجيل الدخول: " + error.message, true);
+    } finally {
+      if (button) button.disabled = false;
+    }
+  }
+
+  async function logout() {
+    const { error } = await client.auth.signOut();
+
+    if (error) {
+      modalMessage("تعذر تسجيل الخروج: " + error.message, true);
+      return;
+    }
+
+    await updateAdminView();
+    modalMessage("تم تسجيل الخروج.");
+  }
+
   const loginBtn = $("loginBtn");
   if (loginBtn) {
     loginBtn.addEventListener("click", login);
