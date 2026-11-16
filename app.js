@@ -605,7 +605,16 @@ if (loginPanel) loginPanel.hidden = allowed;
     modalMessage("تم تسجيل الخروج.");
   }
 
-    const loginBtn = $("loginBtn");
+      const loginBtn = $("loginBtn");
+  const logoutBtn = $("logoutBtn");
+
+  if (loginBtn) {
+    loginBtn.onclick = login;
+  }
+
+  if (logoutBtn) {
+    logoutBtn.onclick = logout;
+  }
 
   if (loginBtn) {
     loginBtn.onclick = login;
