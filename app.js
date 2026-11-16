@@ -65,7 +65,77 @@
     return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${clean}`;
   }
 
-  function renderApps() {
+
+function renderApps() {
+  if (!grid) return;
+
+  if (count) count.textContent = apps.length;
+
+  if (!apps.length) {
+    grid.innerHTML = '<p class="empty-state">لا توجد تطبيقات حالياً</p>';
+    return;
+  }
+
+  grid.innerHTML = apps.map((app) => {
+    const cover = publicUrl(IMAGE_BUCKET, app.image_path);
+    const icon = publicUrl(IMAGE_BUCKET, app.icon_path);
+    const apk = publicUrl(APK_BUCKET, app.storage_path);
+    const downloads = Number(app.downloads || 0);
+
+    return `
+      <article class="app-card">
+        ${cover ? `<img class="app-cover" src="${cover}" alt="صورة ${safeText(app.name)}">` : ""}
+
+        <div class="app-content">
+          ${icon ? `<img class="app-icon" src="${icon}" alt="أيقونة التطبيق">` : ""}
+          <div class="app-info">
+            <h3>${safeText(app.name)}</h3>
+            <p>${safeText(app.description)}</p>
+            <small>الإصدار: ${safeText(app.version || "1.0")}</small>
+          </div>
+        </div>
+
+        <div class="download-count">
+          ⬇️ ${downloads.toLocaleString("en-US")} تحميل
+        </div>
+
+        <a class="download-btn"
+           href="${apk}"
+           data-download="${safeText(app.id)}"
+           target="_blank"
+           rel="noopener"
+           download>
+          تحميل التطبيق
+        </a>
+      </article>
+    `;
+  }).join("");
+
+  grid.querySelectorAll("[data-download]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const app = apps.find(
+        item => String(item.id) === button.dataset.download
+      );
+
+      if (!app) return;
+
+      const { data, error } = await client.rpc(
+        "increment_app_downloads",
+        { p_app_id: String(app.id) }
+      );
+
+      if (error) {
+        console.error("Download counter error:", error);
+        message("تعذر تحديث عداد التحميلات.", true);
+        return;
+      }
+
+      app.downloads = Number(data);
+      renderApps();
+    });
+  });
+}
+
     if (!grid) return;
 
     if (count) count.textContent = apps.length;
