@@ -488,65 +488,7 @@
       submit.disabled = false;
     }
   }
-
-
-    const adminPanel = $("adminPanel");
-    const loginForm = $("loginForm");
-
-    const allowed = await isAdmin();
-
-    if (adminPanel) adminPanel.hidden = !allowed;
-    if (loginForm) loginForm.hidden = allowed;
-
-    renderAdminApps();
-  }
-async function updateAdminView() 
-
-  async function login() {
-const loginForm = $("loginForm");
-const loginPanel = $("loginPanel");
-
-if (loginPanel) loginPanel.hidden = allowed;
-      modalMessage("أدخل البريد الإلكتروني وكلمة المرور.", true);
-      return;
-    }
-
-    const button = $("loginBtn");
-    if (button) button.disabled = true;
-
-    const { error } = await client.auth.signInWithPassword({
-      email,
-      password
-    });
-
-    if (button) button.disabled = false;
-
-    if (error) {
-      modalMessage("تعذر تسجيل الدخول: " + error.message, true);
-      return;
-    }
-
-    modalMessage("تم تسجيل الدخول بنجاح.");
-    await updateAdminView();
-  }
-
-
-  const adminOpen = $("adminOpen");
-  const adminDialog = $("adminDialog");
-  const closeAdmin = $("closeAdmin");
-
-  if (adminOpen && adminDialog) {
-    adminOpen.addEventListener("click", () => {
-      if (!adminDialog.open) adminDialog.showModal();
-    });
-  }
-
-  if (closeAdmin && adminDialog) {
-    closeAdmin.addEventListener("click", () => {
-      adminDialog.close();
-    });
-  }
-
+  
   async function updateAdminView() {
     const adminPanel = $("adminPanel");
     const loginPanel = $("loginPanel");
@@ -554,7 +496,9 @@ if (loginPanel) loginPanel.hidden = allowed;
 
     const allowed = await isAdmin();
 
-    if (adminPanel) adminPanel.hidden = !allowed;
+    if (adminPanel) {
+      adminPanel.hidden = !allowed;
+    }
 
     if (loginPanel) {
       loginPanel.hidden = allowed;
@@ -607,7 +551,7 @@ if (loginPanel) loginPanel.hidden = allowed;
     }
   }
 
-async function logout() {
+  async function logout() {
     try {
       const { error } = await client.auth.signOut();
 
@@ -628,7 +572,9 @@ async function logout() {
 
   if (adminOpen && adminDialog) {
     adminOpen.addEventListener("click", () => {
-      if (!adminDialog.open) adminDialog.showModal();
+      if (!adminDialog.open) {
+        adminDialog.showModal();
+      }
     });
   }
 
@@ -661,7 +607,7 @@ async function logout() {
 
   client.auth.onAuthStateChange((event) => {
     if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
-      updateAdminView();
+      setTimeout(() => updateAdminView(), 0);
     }
   });
 
@@ -669,4 +615,5 @@ async function logout() {
   updateAdminView();
 
 })();
-  
+
+    
