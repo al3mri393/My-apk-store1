@@ -44,10 +44,33 @@
   </main>
 
   <footer class="wrap footer"><span>© <span id="year"></span> معرض تطبيقاتي</span><span>واجهة عربية • تصميم متجاوب</span></footer>
-<button type="button" onclick="document.getElementById('adminDialog').showModal()">اختبار فتح لوحة الأدمن</button>
+
   <dialog id="adminDialog" class="modal">
-    <div class="modal-head"><div><span class="eyebrow">مساحة الإدارة</span><h2>لوحة الأدمن</h2></div><button class="icon-btn" id="closeAdmin" aria-label="إغلاق">×</button></div>
+    <div class="modal-head">
+      <div>
+        <span class="eyebrow">مساحة الإدارة</span>
+        <h2>لوحة الأدمن</h2>
+      </div>
+      <button class="icon-btn" id="closeAdmin" type="button" aria-label="إغلاق">×</button>
+    </div>
+
     <div id="loginPanel">
+      <p class="muted">سجّل الدخول بحساب الأدمن الذي أنشأته في Supabase.</p>
+
+      <form id="loginForm">
+        <label>البريد الإلكتروني
+          <input id="email" type="email" autocomplete="username" placeholder="admin@example.com" required>
+        </label>
+
+        <label>كلمة المرور
+          <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" required>
+        </label>
+
+        <button id="loginBtn" type="submit" class="btn btn-primary full">
+          تسجيل الدخول
+        </button>
+      </form>
+    </div> 
       <p class="muted">سجّل الدخول بحساب الأدمن الذي أنشأته في Supabase.</p>
       <label>البريد الإلكتروني<input id="email" type="email" autocomplete="username" placeholder="admin@example.com"></label>
       <label>كلمة المرور<input id="password" type="password" autocomplete="current-password" placeholder="••••••••"></label>
