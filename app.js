@@ -489,7 +489,7 @@
     }
   }
 
-  async function updateAdminView() {
+
     const adminPanel = $("adminPanel");
     const loginForm = $("loginForm");
 
@@ -500,13 +500,13 @@
 
     renderAdminApps();
   }
-
+async function updateAdminView() 
 
   async function login() {
-    const email = $("email")?.value.trim();
-    const password = $("password")?.value;
+const loginForm = $("loginForm");
+const loginPanel = $("loginPanel");
 
-    if (!email || !password) {
+if (loginPanel) loginPanel.hidden = allowed;
       modalMessage("أدخل البريد الإلكتروني وكلمة المرور.", true);
       return;
     }
