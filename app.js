@@ -530,7 +530,21 @@ if (loginPanel) loginPanel.hidden = allowed;
     await updateAdminView();
   }
 
-  const adminOpen = $("adminOpen");
+const adminOpen = $("adminOpen");
+const adminDialog = $("adminDialog");
+const closeAdmin = $("closeAdmin");
+
+if (adminOpen && adminDialog) {
+  adminOpen.onclick = () => {
+    adminDialog.showModal();
+  };
+}
+
+if (closeAdmin && adminDialog) {
+  closeAdmin.onclick = () => {
+    adminDialog.close();
+  };
+}
   const adminDialog = $("adminDialog");
 
   if (adminOpen && adminDialog) {
