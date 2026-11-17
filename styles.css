@@ -916,3 +916,26 @@ button {
     transition: none !important;
   }
 }
+.download-btn {
+  display: flex !important;
+  width: 100%;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #baffce, #26e875);
+  color: #082012 !important;
+  border: 0;
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.download-btn::before {
+  content: "⬇";
+  margin-left: 8px;
+}
