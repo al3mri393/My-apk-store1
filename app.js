@@ -608,7 +608,7 @@ function renderApps() {
       });
 
       if (error) throw error;
-
+console.log("LOGIN SUCCESS - USER:", await client.auth.getUser());
       await updateAdminView();
       modalMessage("تم تسجيل الدخول بنجاح.");
 
