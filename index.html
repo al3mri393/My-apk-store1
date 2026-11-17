@@ -4,7 +4,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#0b1410">
+  <meta name="theme-color" content="#050907">
+  <meta name="description" content="معرض تطبيقاتي - اكتشف وحمّل تطبيقاتك المفضلة بسهولة.">
   <title>معرض تطبيقاتي</title>
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -14,18 +15,23 @@
   <div class="ambient ambient-b"></div>
 
   <header class="topbar wrap">
-    <a class="brand" href="#">
+    <a class="brand" href="#" aria-label="العودة إلى الرئيسية">
       <span class="brand-mark">م</span>
       <span>معرض <b>تطبيقاتي</b></span>
     </a>
 
+    <nav class="site-nav">
+      <a href="#apps">التطبيقات</a>
+      <a href="#about">عن المعرض</a>
+    </nav>
+
     <button
-  id="adminOpen"
-  type="button"
-  class="btn btn-primary"
-  onclick="document.getElementById('adminDialog').showModal()">
-  لوحة الأدمن
-</button>
+      id="adminOpen"
+      type="button"
+      class="btn btn-primary"
+      onclick="document.getElementById('adminDialog').showModal()">
+      لوحة الأدمن
+    </button>
   </header>
 
   <main>
@@ -33,10 +39,14 @@
       <div class="hero-copy">
         <span class="eyebrow"><i></i> مكتبة تطبيقاتك في مكان واحد</span>
         <h1>اكتشف تطبيقاتك<br><em>بأسلوب جديد.</em></h1>
-        <p>منصة بسيطة وأنيقة لاستعراض التطبيقات وتحميل أحدث إصداراتها بسهولة.</p>
-        <a class="btn btn-primary" href="#apps">
-          استعرض التطبيقات <span>←</span>
+        <p>منصة أنيقة تجمع تطبيقاتك المفضلة، وتتيح لك استعراضها وتحميل أحدث إصداراتها بسهولة.</p>
+        <a class="btn btn-primary hero-button" href="#apps">
+          استكشف التطبيقات <span>←</span>
         </a>
+        <div class="hero-note">
+          <span class="status-dot"></span>
+          <span>تطبيقاتك المفضلة، أقرب إليك</span>
+        </div>
       </div>
 
       <div class="hero-orbit" aria-hidden="true">
@@ -48,18 +58,28 @@
           <strong>تطبيقات تستحق التجربة</strong>
           <small>تحميل • تحديث • اكتشاف</small>
         </div>
-        <span class="float-chip chip-one">APK</span>
-        <span class="float-chip chip-two">01 / 02</span>
+        <span class="float-chip chip-one">APK STORE</span>
+        <span class="float-chip chip-two">اكتشف الجديد</span>
       </div>
     </section>
 
     <section id="apps" class="wrap app-section">
       <div class="section-head">
         <div>
-          <span class="eyebrow">المكتبة</span>
-          <h2>تطبيقاتنا</h2>
+          <span class="eyebrow">مكتبتك الرقمية</span>
+          <h2>استكشف التطبيقات</h2>
+          <p class="section-description">اختر التطبيق الذي تبحث عنه وحمّله بسهولة.</p>
         </div>
         <span id="appCount" class="count">جارٍ تحميل التطبيقات...</span>
+      </div>
+
+      <div class="search-wrap">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <input
+          id="appSearch"
+          type="search"
+          placeholder="ابحث عن تطبيق بالاسم أو الوصف..."
+          aria-label="ابحث عن تطبيق">
       </div>
 
       <div id="notice" class="notice" hidden></div>
@@ -68,6 +88,10 @@
         <article class="app-card skeleton"></article>
         <article class="app-card skeleton"></article>
       </div>
+
+      <p id="noSearchResults" class="empty-search" hidden>
+        لا توجد تطبيقات تطابق بحثك.
+      </p>
     </section>
 
     <section id="about" class="wrap about">
@@ -75,7 +99,7 @@
         <span class="eyebrow">مصمّم ببساطة</span>
         <h2>كل ما تحتاجه،<br><em>في مكان واحد.</em></h2>
       </div>
-      <p>يُدار هذا المعرض من لوحة تحكم خاصة. ملفات التطبيقات محفوظة في التخزين السحابي، وتُحمّل عبر روابط مخصصة.</p>
+      <p>يُدار هذا المعرض من لوحة تحكم خاصة. ملفات التطبيقات محفوظة في التخزين السحابي، لتتمكن من الوصول إليها وتحميلها بسهولة.</p>
     </section>
   </main>
 
@@ -85,7 +109,6 @@
   </footer>
 
   <dialog id="adminDialog" class="modal">
-
     <div class="modal-head">
       <div>
         <span class="eyebrow">مساحة الإدارة</span>
@@ -159,12 +182,48 @@
     </div>
 
     <p id="modalMessage" class="form-message" role="status"></p>
-
   </dialog>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="app.js"></script>
+
+  <script>
+    (() => {
+      const search = document.getElementById("appSearch");
+      const grid = document.getElementById("appsGrid");
+      const empty = document.getElementById("noSearchResults");
+      const year = document.getElementById("year");
+
+      if (year) year.textContent = new Date().getFullYear();
+
+      if (!search || !grid) return;
+
+      function filterApps() {
+        const query = search.value.trim().toLocaleLowerCase("ar");
+        const cards = grid.querySelectorAll(".app-card");
+        let visible = 0;
+
+        cards.forEach((card) => {
+          const matches = card.textContent
+            .toLocaleLowerCase("ar")
+            .includes(query);
+
+          card.hidden = !matches;
+          if (matches) visible++;
+        });
+
+        if (empty) {
+          empty.hidden = !query || visible > 0;
+        }
+      }
+
+      search.addEventListener("input", filterApps);
+
+      const observer = new MutationObserver(filterApps);
+      observer.observe(grid, { childList: true, subtree: true });
+    })();
+  </script>
 
 </body>
 </html>
