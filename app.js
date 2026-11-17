@@ -607,11 +607,16 @@ function renderApps() {
         password
       });
 
-      if (error) throw error;
-console.log("LOGIN SUCCESS - USER:", await client.auth.getUser());
-      await updateAdminView();
-      modalMessage("تم تسجيل الدخول بنجاح.");
+      if (adminPanel) {
+  adminPanel.hidden = !allowed;
+}
 
+if (allowed) {
+  const dialog = $("adminDialog");
+  if (dialog && !dialog.open) {
+    dialog.showModal();
+  }
+}
     } catch (error) {
       modalMessage("تعذر تسجيل الدخول: " + error.message, true);
       console.error("Login error:", error);
