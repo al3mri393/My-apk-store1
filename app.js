@@ -62,80 +62,11 @@
     const clean = file.name
       .normalize("NFKD")
       .replace(/[^a-zA-Z0-9._-]/g, "-");
+
     return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${clean}`;
   }
 
-
-function renderApps() {
-  if (!grid) return;
-
-  if (count) count.textContent = apps.length;
-
-  if (!apps.length) {
-    grid.innerHTML = '<p class="empty-state">لا توجد تطبيقات حالياً</p>';
-    return;
-  }
-
-  grid.innerHTML = apps.map((app) => {
-    const cover = publicUrl(IMAGE_BUCKET, app.image_path);
-    const icon = publicUrl(IMAGE_BUCKET, app.icon_path);
-    const apk = publicUrl(APK_BUCKET, app.storage_path);
-    const downloads = Number(app.downloads || 0);
-
-    return `
-      <article class="app-card">
-        ${cover ? `<img class="app-cover" src="${cover}" alt="صورة ${safeText(app.name)}">` : ""}
-
-        <div class="app-content">
-          ${icon ? `<img class="app-icon" src="${icon}" alt="أيقونة التطبيق">` : ""}
-          <div class="app-info">
-            <h3>${safeText(app.name)}</h3>
-            <p>${safeText(app.description)}</p>
-            <small>الإصدار: ${safeText(app.version || "1.0")}</small>
-          </div>
-        </div>
-
-        <div class="download-count">
-          ⬇️ ${downloads.toLocaleString("en-US")} تحميل
-        </div>
-
-        <a class="download-btn"
-           href="${apk}"
-           data-download="${safeText(app.id)}"
-           target="_blank"
-           rel="noopener"
-           download>
-          تحميل التطبيق
-        </a>
-      </article>
-    `;
-  }).join("");
-
-  grid.querySelectorAll("[data-download]").forEach((button) => {
-    button.addEventListener("click", async () => {
-      const app = apps.find(
-        item => String(item.id) === button.dataset.download
-      );
-
-      if (!app) return;
-
-      const { data, error } = await client.rpc(
-        "increment_app_downloads",
-        { p_app_id: String(app.id) }
-      );
-
-      if (error) {
-        console.error("Download counter error:", error);
-        message("تعذر تحديث عداد التحميلات.", true);
-        return;
-      }
-
-      app.downloads = Number(data);
-      renderApps();
-    });
-  });
-}
-
+  function renderApps() {
     if (!grid) return;
 
     if (count) count.textContent = apps.length;
@@ -149,10 +80,12 @@ function renderApps() {
       const cover = publicUrl(IMAGE_BUCKET, app.image_path);
       const icon = publicUrl(IMAGE_BUCKET, app.icon_path);
       const apk = publicUrl(APK_BUCKET, app.storage_path);
+      const downloads = Number(app.downloads || 0);
 
       return `
         <article class="app-card">
           ${cover ? `<img class="app-cover" src="${cover}" alt="صورة ${safeText(app.name)}">` : ""}
+
           <div class="app-content">
             ${icon ? `<img class="app-icon" src="${icon}" alt="أيقونة التطبيق">` : ""}
             <div class="app-info">
@@ -161,18 +94,56 @@ function renderApps() {
               <small>الإصدار: ${safeText(app.version || "1.0")}</small>
             </div>
           </div>
-          <a class="download-btn" href="${apk}" target="_blank" rel="noopener" download>
+
+          <div class="download-count">
+            ⬇️ ${downloads.toLocaleString("en-US")} تحميل
+          </div>
+
+          <a class="download-btn"
+             href="${apk}"
+             data-download="${safeText(app.id)}"
+             target="_blank"
+             rel="noopener"
+             download>
             تحميل التطبيق
           </a>
         </article>
       `;
     }).join("");
+
+    grid.querySelectorAll("[data-download]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const app = apps.find(
+          item => String(item.id) === button.dataset.download
+        );
+
+        if (!app) return;
+
+        const { data, error } = await client.rpc(
+          "increment_app_downloads",
+          { p_app_id: String(app.id) }
+        );
+
+        if (error) {
+          console.error("Download counter error:", error);
+          return;
+        }
+
+        app.downloads = Number(data);
+
+        const counter = button.parentElement.querySelector(".download-count");
+        if (counter) {
+          counter.textContent =
+            `⬇️ ${app.downloads.toLocaleString("en-US")} تحميل`;
+        }
+      });
+    });
   }
 
   async function loadApps() {
     if (!grid) return;
 
-    grid.innerHTML = '<p>جاري تحميل التطبيقات...</p>';
+    grid.innerHTML = "<p>جاري تحميل التطبيقات...</p>";
 
     const { data, error } = await client
       .from("apps")
@@ -181,7 +152,7 @@ function renderApps() {
 
     if (error) {
       message("تعذر تحميل التطبيقات: " + error.message, true);
-      grid.innerHTML = '<p>تعذر تحميل التطبيقات</p>';
+      grid.innerHTML = "<p>تعذر تحميل التطبيقات</p>";
       return;
     }
 
@@ -198,6 +169,7 @@ function renderApps() {
     }
 
     const path = filePath(file);
+
     const { error } = await client.storage
       .from(IMAGE_BUCKET)
       .upload(path, file, {
@@ -217,6 +189,7 @@ function renderApps() {
     });
 
     const path = filePath(file);
+
     const { error } = await client.storage
       .from(APK_BUCKET)
       .upload(path, apkFile, {
@@ -240,7 +213,13 @@ function renderApps() {
   }
 
   async function isAdmin() {
-    const { data } = await client.auth.getSession();
+    const { data, error } = await client.auth.getSession();
+
+    if (error) {
+      console.error("Session check error:", error);
+      return false;
+    }
+
     const user = data?.session?.user;
 
     return Boolean(user && user.id === ADMIN_EMAIL);
@@ -265,14 +244,18 @@ function renderApps() {
 
     area.querySelectorAll("[data-edit]").forEach((button) => {
       button.addEventListener("click", () => {
-        const app = apps.find((item) => String(item.id) === button.dataset.edit);
+        const app = apps.find(
+          item => String(item.id) === button.dataset.edit
+        );
         if (app) openEditor(app);
       });
     });
 
     area.querySelectorAll("[data-delete]").forEach((button) => {
       button.addEventListener("click", () => {
-        const app = apps.find((item) => String(item.id) === button.dataset.delete);
+        const app = apps.find(
+          item => String(item.id) === button.dataset.delete
+        );
         if (app) deleteApp(app);
       });
     });
@@ -287,6 +270,7 @@ function renderApps() {
     if (!dialog) {
       dialog = document.createElement("dialog");
       dialog.id = "appEditor";
+
       dialog.innerHTML = `
         <form id="editForm">
           <h3>تعديل التطبيق</h3>
@@ -331,7 +315,6 @@ function renderApps() {
       document.body.appendChild(dialog);
 
       $("closeEditor").addEventListener("click", () => dialog.close());
-
       $("editForm").addEventListener("submit", saveEdit);
     }
 
@@ -452,10 +435,12 @@ function renderApps() {
       }
 
       status.textContent = "تم حفظ التعديلات بنجاح.";
+
       editingApp = null;
       galleryToDelete = [];
 
       $("appEditor").close();
+
       message("تم تحديث التطبيق بنجاح.");
       await loadApps();
 
@@ -484,7 +469,9 @@ function renderApps() {
         [APK_BUCKET, app.storage_path],
         [IMAGE_BUCKET, app.image_path],
         [IMAGE_BUCKET, app.icon_path],
-        ...(app.gallery_paths || []).map((path) => [IMAGE_BUCKET, path])
+        ...(app.gallery_paths || []).map(
+          (path) => [IMAGE_BUCKET, path]
+        )
       ];
 
       for (const [bucket, path] of files) {
@@ -558,32 +545,40 @@ function renderApps() {
       submit.disabled = false;
     }
   }
-  
+
   async function updateAdminView() {
     const adminPanel = $("adminPanel");
     const loginPanel = $("loginPanel");
     const loginForm = $("loginForm");
 
-    const allowed = await isAdmin();
+    try {
+      const allowed = await isAdmin();
 
-    if (adminPanel) {
-      adminPanel.hidden = !allowed;
+      if (adminPanel) {
+        adminPanel.hidden = !allowed;
+      }
+
+      if (loginPanel) {
+        loginPanel.hidden = allowed;
+      } else if (loginForm) {
+        loginForm.hidden = allowed;
+      }
+
+      const identity = $("adminIdentity");
+
+      if (identity && allowed) {
+        const { data } = await client.auth.getUser();
+        identity.textContent = data.user?.email || "الأدمن";
+      }
+
+      renderAdminApps();
+
+      return allowed;
+
+    } catch (error) {
+      console.error("Admin view error:", error);
+      return false;
     }
-
-    if (loginPanel) {
-      loginPanel.hidden = allowed;
-    } else if (loginForm) {
-      loginForm.hidden = allowed;
-    }
-
-    const identity = $("adminIdentity");
-
-    if (identity && allowed) {
-      const { data } = await client.auth.getUser();
-      identity.textContent = data.user?.email || "الأدمن";
-    }
-
-    renderAdminApps();
   }
 
   async function login(event) {
@@ -607,16 +602,19 @@ function renderApps() {
         password
       });
 
-      if (adminPanel) {
-  adminPanel.hidden = !allowed;
-}
+      if (error) throw error;
 
-if (allowed) {
-  const dialog = $("adminDialog");
-  if (dialog && !dialog.open) {
-    dialog.showModal();
-  }
-}
+      const allowed = await updateAdminView();
+
+      if (!allowed) {
+        await client.auth.signOut();
+        throw new Error(
+          "تم التحقق من الدخول، لكن هذا الحساب غير معتمد كأدمن."
+        );
+      }
+
+      modalMessage("تم تسجيل الدخول بنجاح.");
+
     } catch (error) {
       modalMessage("تعذر تسجيل الدخول: " + error.message, true);
       console.error("Login error:", error);
@@ -682,7 +680,9 @@ if (allowed) {
 
   client.auth.onAuthStateChange((event) => {
     if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
-      setTimeout(() => updateAdminView(), 0);
+      setTimeout(() => {
+        updateAdminView();
+      }, 0);
     }
   });
 
@@ -690,5 +690,3 @@ if (allowed) {
   updateAdminView();
 
 })();
-
-    
